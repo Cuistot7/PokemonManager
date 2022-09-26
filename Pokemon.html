@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon</title>
+</head>
+
+<body>
+    <script>
+
+//Attaque
+        class Attaque 
+        {
+            constructor(libelle, degats) 
+            {
+                this.libelle = libelle;
+                this.degats = degats;
+            }
+        }
+
+//Pokemon
+        class Pokemon 
+        {
+            pvRestant;
+            constructor(nom, numero, taille, poids, type, pv, attaque1, attaque2)
+            {
+                this.nom = nom;
+                this.numero = numero;
+                this.taille = taille;
+                this.poids = poids;
+                this.type = type;
+                this.pv = pv;
+                this.attaque1 = attaque1;
+                this.attaque2 = attaque2;
+            }
+
+            //Au debut d'un combat, le nombre de vies restantes est egal au nombre de points de vie
+            reinitialisationPV()
+            {
+                this.pvRestant = this.pv;
+            }
+        
+// attaque un pokemon adverse
+        attaque(Pokemon) 
+        {
+            let attaqueUtilisee;
+            let degats;
+            //Si le pokemon attaquant a plus de 20% de pv restants
+            if(this.pvRestant > ((20 * this.pv) / 100))
+            {
+                //il utilise la premiere attaque
+                attaqueUtilisee = this.attaque1;
+            } 
+            else
+            {
+                //sinon il utilise la deuxieme attaque
+                attaqueUtilisee = this. attaque2;
+            }
+
+            // 10% de chance de faire un double degats
+            if(Math.random() < 0.1)
+            {
+                degats = attaqueUtilisee.degats * 2;
+            } 
+            else
+            {
+                degats = attaqueUtilisee.degats
+            }
+
+            return degats; 
+        }
+    }    
+
+//combat
+        class Combat 
+        {
+            constructor(combattant01, combattant02)
+            {
+                let tirageAuSort = Math.random();
+                //sois le combattant01 est le premier parametre
+                if(tirageAuSort > 0.5)
+                {
+                this.combattant01 = combattant01;
+                this.combattant02 = combattant02;
+                }
+                else
+                {
+                    //soit l'inverse
+                    this.combattant01 = combattant02;
+                    this.combattant02 = combattant01;
+                }
+                    document.writeln("<h4>" + combattant01.nom + "VS" + combattant02.nom + "</h4>");
+                    document.writeln("<p> Le Tirage au sort a décidé que " + this.combattant01.nom + "attaquait en premier. </p>");
+                    document.writeln("<hr />");
+            }
+            vainqueur(combattant01, combattant02)
+            {
+                let vainqueur;
+                //si un des deux pokemon est mi KO, alors l'autre pokemon est vainqueur
+                if(combattant01.pvRestant > 0)
+                {
+                    vainqueur = combattant01;
+                }
+                if(combattant02.pvRestant > 0)
+                {
+                    vainqueur = combattant02;
+                }
+                if(combattant01.pvRestant < 0 && combattant02.pvRestant < 0)
+                {
+                    vainqueur = null;
+                }
+                return vainqueur;
+            }
+        
+
+            combat() 
+            {
+
+                //reinitialisation des pv des combattants
+                this.combattant01.reinitialisationPV();
+                this.combattant02.reinitialisationPV();
+                document.writeln("<p>" + this.combattant01.nom + " a " + this.combattant01.pv + "points de vie");
+                document.writeln("<p>" + this.combattant02.nom + " a " + this.combattant02.pv + "points de vie");
+                document.writeln("<hr />");               
+
+                let degats;
+                
+                //Le combat continu tant et aussi longtemps que un des 2 pokemon a de la vie
+                while(this.combattant01.pvRestant > 0 && this.combattant02.pvRestant > 0)
+                {
+                    //le premier combattant attaque le deuxieme
+                    degats = this.combattant01.attaque(this.combattant02);
+                    //les points de vie du deuxieme combattant diminuent selon le nombre de points de degats
+                    this.combattant02.pvRestant = this.combattant02.pvRestant - degats;
+
+                    document.writeln("<p>" + this.combattant01.nom + " a attaqué. Il a fait " + degats + "de degats.");
+
+                    // le deuxieme combattant attaque le premier combattan
+                    degats = this.combattant02.attaque(this.combattant01);
+                    //les points de vie du premier combattant diminuent selon le nombre de points de degats
+                    this.combattant01.pvRestant = this.combattant01.pvRestant - degats;
+
+                    document.writeln(this.combattant02.nom + " a attaqué. Il a fait " + degats + "de degats.</p>");
+                }
+                    // a la fin du combat
+                    let vainqueur = this.vainqueur(this.combattant01, this.combattant02);
+                    //S'il existe un vainqueur, on le felicite
+                    if(vainqueur)
+                    {
+                        document.writeln("<h4>" + vainqueur.nom + " a gagné le combat. Il lui restait " + vainqueur.pvRestant + "pv.</h4>");
+                    }
+                    else
+                    {
+                        //Sinon, il y a égalité
+                        document.writeln("<h4>EGALITE</h4>");
+                    }
+            }
+        }
+//creation de Pikachu
+        pikachu = new Pokemon("Pikachu", 25, 60, 6.0, "Electrique", 82, new Attaque("Statik", 10), new Attaque("ParaTonnerre", 25));
+
+//creation de Evoli
+        evoli = new Pokemon("Evoli", 133, 30, 6.5, "Normal", 70, new Attaque("Adaptabilite", 9), new Attaque("Anticipation", 15));
+
+        let pikachuVSevoli = new Combat(pikachu, evoli);
+        pikachuVSevoli.combat();
+        
+    </script>
+</body>
+
+</html>
